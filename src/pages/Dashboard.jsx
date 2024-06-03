@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect, useState } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { Pie } from 'react-chartjs-2';
@@ -6,6 +6,7 @@ import FIRDetails from "../components/fir/FIRDetails";
 import { sampleFIRDetail, sampleCaseStatusOptions } from '../components/fir/sampledata';
 
 import "./dashboard.css";
+import { Web3ApiContext } from "../web3Context/apiContext";
 
 const PieChart = ({ smallScreen }) => {
     const data = {
@@ -45,9 +46,15 @@ const Dashboard = () => {
     const [filteredFIRs, setFilteredFIRs] = useState([]);
     const [smallScreen, setSmallScreen] = useState(false);
     const [filterCriteria, setFilterCriteria] = useState('');
+    const {getFIRbyThana} = useContext(Web3ApiContext);
 
     useEffect(() => {
-        setFIRs([sampleFIRDetail]);     // Fetching FIRs using sample data for now
+        getFIRbyThana().then((data) => {
+            setFIRs(data);
+        }).then(() => {
+            console.log(firs)
+        })
+        // setFIRs([sampleFIRDetail]);     // Fetching FIRs using sample data for now
         setFilteredFIRs([sampleFIRDetail]);
     }, []);
 
@@ -97,10 +104,12 @@ const Dashboard = () => {
             <div className="scroll-container">
                 <Scrollbars style={{ width: '100%', minHeight: '1000px' }}>
                     <div>
-                        {filteredFIRs.length > 0 ? (
-                            filteredFIRs.map(fir => (
-                                <FIRDetails key={fir.caseNumber} fir={fir} />
-                            ))
+                        {firs.length > 0 ? (
+                            firs.map(fir => {
+                                return (
+                                <FIRDetails fir={fir} />
+                            )
+                            })
                         ) : (
                             <p>No FIRs found for the selected status.</p>
                         )}

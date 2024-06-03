@@ -81,6 +81,72 @@ const Web3ApiProvider = ({ children }) => {
     }
   };
 
+  const getFIRbyThana = async () => {
+    try {
+      const tx = await getContract();
+      
+      // Fetch FIR IDs
+      const firIds = await tx.getThanaFIRs();
+      
+      // Fetch details for each FIR ID
+      const firDetailsPromises = firIds.map(id => tx.getFIRDetails(id));
+      const firDetails = await Promise.all(firDetailsPromises);
+  
+      // Map FIR details to structured objects
+      const firs = firDetails.map(e => ({
+        victimName: e.victimName,
+        accusedNames: e.accusedNames,
+        subject: e.subject,
+        description: e.description,
+        state: e.state,
+        district: e.district,
+        thanaAddress: e.thanaAddress,
+        documentHash: e.documentHash,
+        firId: e.firId.toString(),
+        lodgedBy: e.lodgedBy,
+        timestamp: e.timestamp.toString(), 
+        status: e.status
+      }));
+  
+      return firs;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getFIRbyVictim = async () => {
+    try {
+      const tx = await getContract();
+      
+      // Fetch FIR IDs
+      const firIds = await tx.getMyFIRs();
+      
+      // Fetch details for each FIR ID
+      const firDetailsPromises = firIds.map(id => tx.getFIRDetails(id));
+      const firDetails = await Promise.all(firDetailsPromises);
+  
+      // Map FIR details to structured objects
+      const firs = firDetails.map(e => ({
+        victimName: e.victimName,
+        accusedNames: e.accusedNames,
+        subject: e.subject,
+        description: e.description,
+        state: e.state,
+        district: e.district,
+        thanaAddress: e.thanaAddress,
+        documentHash: e.documentHash,
+        firId: e.firId.toString(),
+        lodgedBy: e.lodgedBy,
+        timestamp: e.timestamp.toString(), 
+        status: e.status
+      }));
+      console.log(firs)
+      return firs;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     try {
       checkIfWalletIsConnected();
@@ -97,6 +163,8 @@ const Web3ApiProvider = ({ children }) => {
         checkIfWalletIsConnected,
         Disconnect,
         LodgeFIR,
+        getFIRbyThana,
+        getFIRbyVictim
       }}
     >
       {children}
